@@ -52,7 +52,7 @@ void merge(int *array, int low, int middle, int high, int *temp)
 * @temp: temp array for mergin
 */
 
-void merge_sorty(int *array, int low, int high, int *temp)
+void merge_sort_list(int *array, int low, int high, int *temp)
 {
 	int middle;
 
