@@ -1,70 +1,85 @@
 #include "sort.h"
 
 /**
- * merge - Merges two sorted subarrays into a single sorted array.
- * @array: The original array containing the two subarrays.
- * @left: The starting index of the left subarray.
- * @mid: The ending index of the left subarray (mid + 1
- *	is the starting index of the right subarray).
- * @right: The ending index of the right subarray.
- * @tmp: Temporary array to store the merged subarrays.
- */
-void merge(int *array, size_t left, size_t mid, size_t right, int *tmp)
-{
-	size_t i = left, j = mid + 1, k = 0;
+* merge - the function that merges the splitted array from merge_sort_list
+* @array: Array split to merge
+* @low: lowest index of split
+* @middle: middle index of split
+* @high: high index of split
+* @temp: temp array for merging
+*/
 
-	while (i <= mid && j <= right)
+void merge(int *array, int low, int middle, int high, int *temp)
+{
+	int i, j, k, l = 0, r = 0, n, left[4096], right[4096];
+
+	printf("Merging...\n");
+	i = low, j = middle + 1, k = l = 0;
+	while (i <= middle && j <= high)
 	{
-		if (array[i] < array[j])
-			tmp[k++] = array[i++];
+		if (array[i] <= array[j])
+			temp[k] = left[l] = array[i], k++, i++, l++;
 		else
-			tmp[k++] = array[j++];
+			temp[k] = right[r] = array[j], k++, j++, r++;
 	}
-	while (i <= mid)
-		tmp[k++] = array[i++];
-	while (j <= right)
-		tmp[k++] = array[j++];
-	for (i = left, k = 0; i <= right; i++, k++)
-		array[i] = tmp[k];
-}
-
-/**
- * merge_sort_recursive - Recursive function for Merge sort.
- * @array: The array to be sorted.
- * @left: The starting index of the subarray.
- * @right: The ending index of the subarray.
- * @tmp: Temporary array to store merged subarrays.
- */
-void merge_sort_recursive(int *array, size_t left, size_t right, int *tmp)
-{
-	if (left < right)
+	while (i <= middle)
+		temp[k] = left[l] = array[i], k++, i++, l++;
+	while (j <= high)
+		temp[k] = right[r] = array[j], k++, j++, r++;
+	printf("[left]: ");
+	for (n = 0; n < l; n++)
+		(n == 0) ? printf("%d", left[n]) : printf(", %d", left[n]);
+	printf("\n[right]: ");
+	for (n = 0; n < r; n++)
+		(n == 0) ? printf("%d", right[n]) : printf(", %d", right[n]);
+	printf("\n[Done]: ");
+	for (i = low; i <= high; i++)
 	{
-		size_t mid = (left + right) / 2;
-
-		merge_sort_recursive(array, left, mid, tmp);
-		merge_sort_recursive(array, mid + 1, right, tmp);
-		merge(array, left, mid, right, tmp);
-		print_array(array + left, right - left + 1);
+		array[i] = temp[i - low], printf("%d", array[i]);
+		if (i != high)
+			printf(", ");
+		else
+			printf("\n");
 	}
 }
 
 /**
- * merge_sort - Sorts an array of integers in ascending order
- *	using the Merge sort algorithm (top-down approach).
- * @array: The array to be sorted.
- * @size: Size of the array.
- *
- * Description: The function sorts the array using the top-down Merge sort
- *	algorithm and prints the array after each merge operation.
- */
+* merge_sort_list - the function that recurrsive function
+*	utilizing merge sort algorithm
+* @array: Array
+* @low: Lowest index of split
+* @high: highest index of split
+* @temp: temp array for mergin
+*/
+
+void merge_sorty(int *array, int low, int high, int *temp)
+{
+	int middle;
+
+	if (low < high)
+	{
+		middle = ((high + low - 1) / 2);
+		merge_sort_list(array, low, middle, temp);
+		merge_sort_list(array, middle + 1, high, temp);
+		merge(array, low, middle, high, temp);
+	}
+}
+
+/**
+* merge_sort - the function that sorts array with merge sort algorithm
+* @array: array to sort
+* @size: Size of array to sort
+*/
+
 void merge_sort(int *array, size_t size)
 {
+	int *temp;
+
 	if (array == NULL || size < 2)
 		return;
-	int *tmp = malloc(sizeof(int) * size);
-
-	if (tmp == NULL)
+	temp = malloc(sizeof(int) * (size + 1));
+	if (temp == NULL)
 		return;
-	merge_sort_recursive(array, 0, size - 1, tmp);
-	free(tmp);
+	merge_sort_list(array, 0, size - 1, temp);
+	free(temp);
 }
